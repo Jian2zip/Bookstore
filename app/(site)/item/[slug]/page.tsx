@@ -8,15 +8,21 @@ import { OrderBar, OrderPanel, OrderProvider } from "@/components/item/OrderCont
 import { ProductTile } from "@/components/ProductTile";
 import { SiteImage } from "@/components/SiteImage";
 import { conditionLabel } from "@/lib/condition";
-import { getItemBySlug, getListedSlugs, getSimilarItems, getSiteSettings } from "@/lib/data";
+import { getAllSlugs, getItemBySlug, getSimilarItems, getSiteSettings } from "@/lib/data";
 import { formatPrice, getDictionary } from "@/lib/i18n";
+import { absoluteUrl, assetUrl } from "@/lib/paths";
 import type { Item } from "@/lib/types";
 
-/** Prerender every listed item. Sold or new slugs render on first request. */
+/**
+ * Export a page for every item, sold ones included, so old links show the
+ * "sold" notice. Anything else is the static 404.
+ */
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
-  const slugs = await getListedSlugs();
-  // Cache Components needs at least one sample param to validate the route.
-  return slugs.length ? slugs.map(({ slug }) => ({ slug })) : [{ slug: "__none__" }];
+  const slugs = await getAllSlugs();
+  // Static export needs at least one param; "__none__" resolves to notFound().
+  return slugs.length ? slugs.map((slug) => ({ slug })) : [{ slug: "__none__" }];
 }
 
 export async function generateMetadata({ params }: PageProps<"/item/[slug]">): Promise<Metadata> {
@@ -36,7 +42,7 @@ export async function generateMetadata({ params }: PageProps<"/item/[slug]">): P
     openGraph: {
       title: item.seo?.title ?? item.title,
       description,
-      images: [{ url: og.src, width: og.width, height: og.height, alt: og.alt }],
+      images: [{ url: absoluteUrl(assetUrl(og.src)), width: og.width, height: og.height, alt: og.alt }],
     },
   };
 }

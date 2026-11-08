@@ -1,7 +1,7 @@
-"use client";
-
 /**
- * Sanity Studio, embedded at /studio.
+ * Sanity Studio. The site is a static export on GitHub Pages, so the Studio
+ * runs on its own: `npm run studio` locally, `npm run studio:deploy` to host
+ * it at https://<name>.sanity.studio.
  */
 import { visionTool } from "@sanity/vision";
 import { defineConfig } from "sanity";
@@ -15,7 +15,6 @@ const singletons = new Set<string>(SINGLETONS);
 export default defineConfig({
   name: "jianwu",
   title: "減屋",
-  basePath: "/studio",
   projectId: projectId || "placeholder",
   dataset,
   plugins: [structureTool({ structure }), visionTool({ defaultApiVersion: apiVersion })],

@@ -1,18 +1,19 @@
 /**
- * The only module pages should import data from.
+ * The only module pages should import data from. Runs at build time: the site
+ * is a static export (GitHub Pages), so content changes go live on the next
+ * build — see the deploy workflow, which a Sanity webhook can trigger.
  *
  * Source: Sanity when NEXT_PUBLIC_SANITY_PROJECT_ID is set, otherwise the
- * placeholder set. Every function is cached (Cache Components) and tagged so a
- * Sanity webhook can revalidate on publish — e.g. marking an item "sold"
- * removes it from every listing on the next request.
+ * placeholder set.
  *
- * Visibility rule (single source of truth): an item is listed only when
- * status === "inStock" and stock > 0. Sold items are reachable *only* through
- * getItemBySlug, so an old link can render the "sold" notice.
+ * Visibility rule (lib/wall.ts → isListed): sold items never reach the wall,
+ * filters or similar items. They are still exported as pages, so an old link
+ * shows the "sold" notice instead of a 404.
  */
-import { cacheLife, cacheTag } from "next/cache";
+import { cache } from "react";
 import { isSanityConfigured } from "../../sanity/env";
-import type { AboutPage, InterludeTile, Item, ItemType, SiteSettings } from "../types";
+import type { AboutPage, InterludeTile, Item, SiteSettings } from "../types";
+import { byNewest, byWallOrder, filterAndSort, isListed, type WallFilter, type WallSort } from "../wall";
 import {
   placeholderAbout,
   placeholderItems,
@@ -21,60 +22,37 @@ import {
 } from "./placeholder";
 import { client, mapAbout, mapItem, mapSettings, queries, type RawItem, type RawSettings } from "./sanity";
 
-export const TAGS = { items: "items", settings: "settings", about: "about" } as const;
+export { isListed };
+export type { WallFilter, WallSort };
 
-export function isListed(item: Pick<Item, "status" | "stock">): boolean {
-  return item.status === "inStock" && item.stock > 0;
-}
+// ── Loaders (deduplicated per render with React cache) ──────────────────
 
-const byNewest = (a: Item, b: Item) => b.publishedAt.localeCompare(a.publishedAt);
-
-/** Shop's arrangement: sortOrder ascending; unset items after, newest first. */
-const byWallOrder = (a: Item, b: Item) => {
-  const ao = a.sortOrder ?? Number.POSITIVE_INFINITY;
-  const bo = b.sortOrder ?? Number.POSITIVE_INFINITY;
-  return ao === bo ? byNewest(a, b) : ao - bo;
-};
-
-// ── Raw loaders ─────────────────────────────────────────────────────────
-
-async function loadListedItems(): Promise<Item[]> {
-  "use cache";
-  cacheLife("hours");
-  cacheTag(TAGS.items);
+const loadAllItems = cache(async (): Promise<Item[]> => {
   const items = isSanityConfigured
-    ? (await client.fetch<RawItem[]>(queries.listed)).map(mapItem)
+    ? (await client.fetch<RawItem[]>(queries.all)).map(mapItem)
     : placeholderItems;
-  // JS guard on top of the GROQ filter, so the rule holds for both sources.
-  return items.filter(isListed).sort(byWallOrder);
-}
+  return [...items].sort(byNewest);
+});
+
+const loadListedItems = cache(async (): Promise<Item[]> =>
+  (await loadAllItems()).filter(isListed).sort(byWallOrder),
+);
+
+const loadSettings = cache(async (): Promise<{ settings: SiteSettings; tiles: InterludeTile[] }> => {
+  if (!isSanityConfigured) return { settings: placeholderSettings, tiles: placeholderTiles };
+  return mapSettings(await client.fetch<RawSettings | null>(queries.settings), placeholderSettings);
+});
 
 // ── Public API ──────────────────────────────────────────────────────────
 
-export type WallFilter = "all" | ItemType;
-/** "default" = the shop's own arrangement; "newest" = by publishedAt. */
-export type WallSort = "default" | "newest";
-
-/** Items for the product wall. Sold items are never included. */
-export async function getListedItems(
-  filter: WallFilter = "all",
-  sort: WallSort = "default",
-): Promise<Item[]> {
-  const items = await loadListedItems();
-  const filtered = filter === "all" ? items : items.filter((i) => i.type === filter);
-  return sort === "newest" ? [...filtered].sort(byNewest) : filtered;
+/** Items for the product wall, in wall order. Sold items are never included. */
+export async function getListedItems(filter: WallFilter = "all", sort: WallSort = "default"): Promise<Item[]> {
+  return filterAndSort(await loadListedItems(), filter, sort);
 }
 
 /** Any item by slug, sold or not. Callers must check `status`. */
 export async function getItemBySlug(slug: string): Promise<Item | null> {
-  "use cache";
-  cacheLife("hours");
-  cacheTag(TAGS.items, `item:${slug}`);
-  if (isSanityConfigured) {
-    const raw = await client.fetch<RawItem | null>(queries.bySlug, { slug });
-    return raw ? mapItem(raw) : null;
-  }
-  return placeholderItems.find((i) => i.slug === slug) ?? null;
+  return (await loadAllItems()).find((i) => i.slug === slug) ?? null;
 }
 
 /** 2–4 listed items from the same category (falls back to same type). */
@@ -85,7 +63,12 @@ export async function getSimilarItems(item: Item, limit = 4): Promise<Item[]> {
   return [...sameCategory, ...sameType].slice(0, limit);
 }
 
-/** Slugs for generateStaticParams and the sitemap. Listed items only. */
+/** Every slug, sold included: each gets a page so old links still resolve. */
+export async function getAllSlugs(): Promise<string[]> {
+  return (await loadAllItems()).map((i) => i.slug);
+}
+
+/** Listed slugs only (for the sitemap). */
 export async function getListedSlugs(): Promise<{ slug: string; publishedAt: string }[]> {
   return (await loadListedItems()).map(({ slug, publishedAt }) => ({ slug, publishedAt }));
 }
@@ -98,27 +81,12 @@ export async function getWallTiles(): Promise<InterludeTile[]> {
   return (await loadSettings()).tiles;
 }
 
-async function loadSettings(): Promise<{ settings: SiteSettings; tiles: InterludeTile[] }> {
-  "use cache";
-  cacheLife("hours");
-  cacheTag(TAGS.settings);
-  if (!isSanityConfigured) return { settings: placeholderSettings, tiles: placeholderTiles };
-  return mapSettings(await client.fetch<RawSettings | null>(queries.settings), placeholderSettings);
-}
-
-export async function getAboutPage(): Promise<AboutPage> {
-  "use cache";
-  cacheLife("hours");
-  cacheTag(TAGS.about);
+export const getAboutPage = cache(async (): Promise<AboutPage> => {
   if (!isSanityConfigured) return placeholderAbout;
   return mapAbout(await client.fetch(queries.about), placeholderAbout);
-}
+});
 
-/** Every item regardless of status. Only for the stage-1 data check page. */
+/** Every item regardless of status. Only for the dev styleguide. */
 export async function getAllItemsForDebug(): Promise<Item[]> {
-  "use cache";
-  cacheLife("hours");
-  cacheTag(TAGS.items);
-  if (!isSanityConfigured) return [...placeholderItems].sort(byNewest);
-  return (await client.fetch<RawItem[]>(queries.all)).map(mapItem);
+  return loadAllItems();
 }

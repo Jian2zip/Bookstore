@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { isSanityImage, sanityLoader } from "@/lib/sanity-image-loader";
 import type { SiteImage as SiteImageData } from "@/lib/types";
 
 interface Props {
@@ -28,7 +27,8 @@ function blurBackground(lqip: string, width: number, height: number): string {
  * - keeps the native aspect ratio (width/height from CMS metadata, no cropping)
  * - lazy-loads by default; a blurred LQIP sits underneath while loading
  * - the image fades in over it once decoded (instant under reduced motion)
- * - Sanity images are resized/encoded by Sanity's CDN; local files by next/image
+ * - URLs come from the global loader (lib/image-loader.ts): Sanity CDN resizes,
+ *   local files get the GitHub Pages base path
  */
 export function SiteImage({ image, sizes, priority = false, className = "", cover = false }: Props) {
   const [loaded, setLoaded] = useState(false);
@@ -45,7 +45,6 @@ export function SiteImage({ image, sizes, priority = false, className = "", cove
         sizes={sizes}
         loading={priority ? "eager" : "lazy"}
         fetchPriority={priority ? "high" : "auto"}
-        loader={isSanityImage(image.src) ? sanityLoader : undefined}
         onLoad={() => setLoaded(true)}
         data-loaded={loaded || undefined}
         className={`img-fade block w-full ${cover ? "h-full object-cover" : "h-auto"} ${className}`}

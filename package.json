@@ -5,10 +5,12 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
     "lint": "eslint",
     "placeholders": "node scripts/generate-placeholders.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "studio": "sanity dev",
+    "studio:deploy": "sanity deploy",
+    "preview": "npx --yes serve out"
   },
   "dependencies": {
     "@sanity/image-url": "^2.1.1",

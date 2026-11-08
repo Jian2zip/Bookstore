@@ -1,8 +1,23 @@
 import type { NextConfig } from "next";
 
+/**
+ * Static export for GitHub Pages.
+ *
+ * NEXT_PUBLIC_BASE_PATH is the repository path ("/Bookstore") when served at
+ * https://<user>.github.io/Bookstore/. The deploy workflow sets it from
+ * actions/configure-pages; locally it is empty, so `npm run dev` serves at /.
+ */
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
 const nextConfig: NextConfig = {
-  cacheComponents: true,
-  partialPrefetching: true,
+  output: "export",
+  basePath,
+  // /item/foo/ → item/foo/index.html: works on any static host without rewrites.
+  trailingSlash: true,
+  images: {
+    loader: "custom",
+    loaderFile: "./lib/image-loader.ts",
+  },
   turbopack: {
     rules: {
       "*.css": {
@@ -10,13 +25,6 @@ const nextConfig: NextConfig = {
         as: "*.css",
       },
     },
-  },
-  images: {
-    // AVIF first, WebP fallback (next/image negotiates via Accept header).
-    formats: ["image/avif", "image/webp"],
-    qualities: [60, 75],
-    remotePatterns: [new URL("https://cdn.sanity.io/images/**")],
-    localPatterns: [{ pathname: "/placeholder/**" }],
   },
 };
 

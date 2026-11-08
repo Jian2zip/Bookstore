@@ -19,7 +19,9 @@ export async function SiteHeader() {
           <NavLinks
             links={[
               { href: "/", label: t.nav.products, match: ["/item/"] },
-              { href: "/about", label: t.nav.about },
+              // Stage 4 adds the About page; until then the link stays hidden
+              // so the live site has no dead ends.
+              // { href: "/about", label: t.nav.about },
             ]}
           />
           <ThemeToggle labels={{ toDark: t.nav.themeToDark, toLight: t.nav.themeToLight }} />

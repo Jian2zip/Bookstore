@@ -1,27 +1,6 @@
 import Link from "next/link";
-import type { WallFilter, WallSort } from "@/lib/data";
 import type { Dictionary } from "@/lib/i18n";
-
-/** URL ⇄ state. `?type=books|goods` and `?sort=newest`; defaults are omitted. */
-export function parseWallParams(params: Record<string, string | string[] | undefined>): {
-  filter: WallFilter;
-  sort: WallSort;
-} {
-  const type = typeof params.type === "string" ? params.type : undefined;
-  const sort = typeof params.sort === "string" ? params.sort : undefined;
-  return {
-    filter: type === "books" ? "book" : type === "goods" ? "goods" : "all",
-    sort: sort === "newest" ? "newest" : "default",
-  };
-}
-
-export function wallHref(filter: WallFilter, sort: WallSort): string {
-  const q = new URLSearchParams();
-  if (filter !== "all") q.set("type", filter === "book" ? "books" : "goods");
-  if (sort === "newest") q.set("sort", "newest");
-  const s = q.toString();
-  return s ? `/?${s}` : "/";
-}
+import { wallHref, type WallFilter, type WallSort } from "@/lib/wall";
 
 /** The one-line text filter row: 全部 / 書 / 雜貨 ……… 最新 */
 export function WallFilters({ filter, sort, t }: { filter: WallFilter; sort: WallSort; t: Dictionary["wall"] }) {

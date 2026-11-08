@@ -1,4 +1,5 @@
 import { SiteImage } from "@/components/SiteImage";
+import { assetUrl } from "@/lib/paths";
 import type { GalleryEntry } from "@/lib/types";
 
 /**
@@ -22,8 +23,8 @@ export function ItemGallery({ entries, label }: { entries: GalleryEntry[]; label
                 <div className={landscape ? "aspect-video" : "aspect-[4/5]"}>
                   {entry.kind === "video" ? (
                     <video
-                      src={entry.src}
-                      poster={entry.poster?.src}
+                      src={assetUrl(entry.src)}
+                      poster={entry.poster ? assetUrl(entry.poster.src) : undefined}
                       controls
                       muted
                       playsInline
