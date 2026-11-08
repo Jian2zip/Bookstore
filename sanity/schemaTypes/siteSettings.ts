@@ -45,8 +45,6 @@ export const siteSettings = defineType({
       group: "shipping",
       fields: [
         defineField({ name: "method", title: "寄送方式", type: "string", initialValue: "超商店到店" }),
-        defineField({ name: "fee", title: "運費（NT$）", description: "留空顯示「待定」。", type: "number", validation: (r) => r.integer().min(0) }),
-        defineField({ name: "feeNotes", title: "運費說明", type: "text", rows: 2, initialValue: "多件合併寄送只收一次運費。" }),
         defineField({ name: "dispatchTime", title: "出貨時間（選填）", description: "例如：確認付款後 3 個工作天內寄出", type: "string" }),
       ],
     }),

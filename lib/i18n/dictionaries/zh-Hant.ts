@@ -1,6 +1,8 @@
 /** UI strings. Content (product copy, about text) comes from the CMS, not here. */
 const dictionary = {
   nav: {
+    label: "主選單",
+    home: "首頁",
     products: "商品",
     about: "關於",
     orderList: "訂購清單",
@@ -9,11 +11,12 @@ const dictionary = {
     themeToLight: "切換為淺色",
   },
   wall: {
+    filterLabel: "商品篩選",
     all: "全部",
     books: "書",
     goods: "雜貨",
     newest: "最新",
-    empty: "目前沒有商品。",
+    empty: "這個分類目前沒有商品。",
   },
   item: {
     sold: "此商品已售出",
@@ -47,13 +50,23 @@ const dictionary = {
   common: {
     copy: "複製",
     copied: "已複製",
-    tbd: "待定",
   },
   footer: {
+    contact: "聯絡",
+    info: "購物說明",
+    email: "信箱",
+    phone: "電話",
+    address: "地址",
+    shippingMethod: "寄送方式",
+    paymentLine: "付款方式於 Email 回覆時告知",
     shippingPayment: "運送與付款",
     returns: "退換貨",
     privacy: "隱私權政策",
     cookies: "Cookie 設定",
+  },
+  notFound: {
+    title: "找不到這個頁面",
+    body: "網址可能有誤，或頁面已經移除。",
   },
 } as const;
 

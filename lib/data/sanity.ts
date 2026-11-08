@@ -35,7 +35,7 @@ const itemFields = `
   },
   description, condition, conditionNotes,
   seo{ title, description, ogImage{ ${imageFields} } },
-  "publishedAt": coalesce(publishedAt, _createdAt),
+  "publishedAt": coalesce(publishedAt, _createdAt), sortOrder,
   author, translator, publisher, year, edition, language, isbn,
   dimensions, material, origin
 `;

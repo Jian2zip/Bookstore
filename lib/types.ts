@@ -60,6 +60,8 @@ interface ItemBase {
   seo?: Seo;
   /** ISO date; drives the "Newest" sort. */
   publishedAt: string;
+  /** Shop's own arrangement on the wall (ascending). Unset items follow, newest first. */
+  sortOrder?: number;
 }
 
 export interface BookItem extends ItemBase {
@@ -106,9 +108,6 @@ export interface SiteSettings {
   footerText?: string;
   shipping: {
     method: string;
-    /** `undefined` = fee not decided yet; UI shows "待定". */
-    fee?: number;
-    feeNotes?: string;
     dispatchTime?: string;
   };
   newsletterUrl?: string;

@@ -92,6 +92,9 @@
   --spacing-nav: 3.5rem; /* fixed nav height */
   --container-measure: 32em; /* narrow text column (~32 CJK characters) */
 
+  /* Breakpoints: Tailwind defaults plus xs (480px) for two-up phones. */
+  --breakpoint-xs: 30rem;
+
   --ease-soft: var(--ease);
   --radius-*: initial; /* square corners everywhere */
 }

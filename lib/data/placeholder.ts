@@ -37,8 +37,6 @@ export const placeholderSettings: SiteSettings = {
   socialLinks: [],
   shipping: {
     method: "超商店到店",
-    fee: undefined, // TBD
-    feeNotes: "多件合併寄送只收一次運費。",
   },
 };
 
@@ -85,6 +83,7 @@ export const placeholderItems: Item[] = [
     edition: "初版一刷",
     language: "繁體中文",
     publishedAt: "2026-11-02",
+    sortOrder: 3,
   },
   {
     id: "b002",
@@ -118,6 +117,7 @@ export const placeholderItems: Item[] = [
     edition: "初版",
     language: "繁體中文",
     publishedAt: "2026-10-28",
+    sortOrder: 6,
   },
   {
     id: "b003",
@@ -150,6 +150,7 @@ export const placeholderItems: Item[] = [
     language: "繁體中文",
     isbn: "9780000000003",
     publishedAt: "2026-10-20",
+    sortOrder: 1,
   },
   {
     id: "b004",
@@ -182,6 +183,7 @@ export const placeholderItems: Item[] = [
     edition: "初版",
     language: "繁體中文",
     publishedAt: "2026-10-15",
+    sortOrder: 4,
   },
   {
     id: "b005",
@@ -213,6 +215,7 @@ export const placeholderItems: Item[] = [
     year: 2009,
     language: "英文",
     publishedAt: "2026-11-05",
+    sortOrder: 8,
   },
   {
     // ── SOLD: must be hidden everywhere except its own (noindex) URL ──
@@ -263,6 +266,7 @@ export const placeholderItems: Item[] = [
     material: "黃銅、毛氈",
     origin: "日本",
     publishedAt: "2026-11-01",
+    sortOrder: 2,
   },
   {
     id: "g002",
@@ -290,6 +294,7 @@ export const placeholderItems: Item[] = [
     material: "棉",
     origin: "台灣",
     publishedAt: "2026-10-30",
+    sortOrder: 7,
   },
   {
     id: "g003",
@@ -316,6 +321,7 @@ export const placeholderItems: Item[] = [
     dimensions: "直徑 6 × 高 7 cm",
     material: "玻璃",
     publishedAt: "2026-10-18",
+    sortOrder: 5,
   },
   {
     id: "g004",
@@ -348,5 +354,5 @@ export const placeholderItems: Item[] = [
 export const placeholderTiles: InterludeTile[] = [
   { id: "tile-shelf", image: img("tile-shelf", "店內書架一角"), position: 2 },
   { id: "tile-display", image: img("tile-display", "店內陳列桌"), position: 5 },
-  { id: "tile-spines", image: img("tile-spines", "書脊特寫"), position: 8 },
+  { id: "tile-spines", image: img("tile-spines", "書脊特寫"), position: 6 },
 ];

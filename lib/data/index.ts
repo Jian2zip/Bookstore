@@ -29,6 +29,13 @@ export function isListed(item: Pick<Item, "status" | "stock">): boolean {
 
 const byNewest = (a: Item, b: Item) => b.publishedAt.localeCompare(a.publishedAt);
 
+/** Shop's arrangement: sortOrder ascending; unset items after, newest first. */
+const byWallOrder = (a: Item, b: Item) => {
+  const ao = a.sortOrder ?? Number.POSITIVE_INFINITY;
+  const bo = b.sortOrder ?? Number.POSITIVE_INFINITY;
+  return ao === bo ? byNewest(a, b) : ao - bo;
+};
+
 // ── Raw loaders ─────────────────────────────────────────────────────────
 
 async function loadListedItems(): Promise<Item[]> {
@@ -39,18 +46,23 @@ async function loadListedItems(): Promise<Item[]> {
     ? (await client.fetch<RawItem[]>(queries.listed)).map(mapItem)
     : placeholderItems;
   // JS guard on top of the GROQ filter, so the rule holds for both sources.
-  return items.filter(isListed).sort(byNewest);
+  return items.filter(isListed).sort(byWallOrder);
 }
 
 // ── Public API ──────────────────────────────────────────────────────────
 
 export type WallFilter = "all" | ItemType;
-export type WallSort = "newest";
+/** "default" = the shop's own arrangement; "newest" = by publishedAt. */
+export type WallSort = "default" | "newest";
 
 /** Items for the product wall. Sold items are never included. */
-export async function getListedItems(filter: WallFilter = "all"): Promise<Item[]> {
+export async function getListedItems(
+  filter: WallFilter = "all",
+  sort: WallSort = "default",
+): Promise<Item[]> {
   const items = await loadListedItems();
-  return filter === "all" ? items : items.filter((i) => i.type === filter);
+  const filtered = filter === "all" ? items : items.filter((i) => i.type === filter);
+  return sort === "newest" ? [...filtered].sort(byNewest) : filtered;
 }
 
 /** Any item by slug, sold or not. Callers must check `status`. */

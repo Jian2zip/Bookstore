@@ -135,6 +135,14 @@ export const item = defineType({
           ),
     }),
     defineField({
+      name: "sortOrder",
+      title: "牆面排序（選填）",
+      description: "數字小的排前面。留空的商品排在後面，依上架時間由新到舊。訪客點「最新」時改依上架時間排序。",
+      type: "number",
+      group: "main",
+      validation: (r) => r.integer(),
+    }),
+    defineField({
       name: "publishedAt",
       title: "上架時間",
       description: "用於「最新」排序。",
@@ -232,6 +240,7 @@ export const item = defineType({
     defineField({ name: "seo", title: "SEO", type: "seo", group: "seo" }),
   ],
   orderings: [
+    { title: "牆面排序", name: "wall", by: [{ field: "sortOrder", direction: "asc" }, { field: "publishedAt", direction: "desc" }] },
     { title: "最新上架", name: "newest", by: [{ field: "publishedAt", direction: "desc" }] },
     { title: "SKU", name: "sku", by: [{ field: "sku", direction: "asc" }] },
   ],
