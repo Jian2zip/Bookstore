@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "studio": "sanity dev",
     "studio:deploy": "sanity deploy",
-    "preview": "npx --yes serve out"
+    "preview": "npx --yes serve out",
+    "publish:pages": "node scripts/publish-pages.mjs"
   },
   "dependencies": {
     "@sanity/image-url": "^2.1.1",

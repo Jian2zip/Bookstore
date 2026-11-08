@@ -8,6 +8,21 @@
 
 ## 上線到 GitHub Pages
 
+有兩種方式，擇一即可。
+
+### 方式 A：從 branch 根目錄部署（目前使用）
+
+Pages 的 Source 維持 **Deploy from a branch**，選這個 branch 的 `/ (root)`。根目錄的 `index.html`、`_next/`、`item/` 等是建置好的網站，修改程式後要重新產生：
+
+```bash
+npm run publish:pages   # 建置並複製到根目錄
+git add -A && git commit -m "Update site" && git push
+```
+
+根目錄的 `.nojekyll` 不能刪（否則 Jekyll 會忽略 `_next/`）。
+
+### 方式 B：GitHub Actions（不需要把建置結果放進 repo）
+
 1. **啟用 Pages（只需一次）**：repo 的 Settings → Pages → Build and deployment → Source 選 **GitHub Actions**。
 2. **合併到 `main`**：`.github/workflows/deploy-pages.yml` 會在 `main` 有新 commit 時自動建置並發布（約 2 分鐘）。也可以在 Actions 分頁手動執行「Deploy to GitHub Pages」。
 
