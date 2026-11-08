@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ViewTransition } from "react";
 import { conditionLabel } from "@/lib/condition";
 import { formatPrice } from "@/lib/i18n";
 import type { Item } from "@/lib/types";
@@ -18,7 +19,10 @@ export function ProductTile({ item, priority = false }: { item: Item; priority?:
 
   return (
     <Link href={`/item/${item.slug}`} className="tile-hover block">
-      <SiteImage image={item.heroImage} sizes={WALL_SIZES} priority={priority} />
+      {/* Same name as the detail-page hero: the image morphs into place on click. */}
+      <ViewTransition name={`item-${item.slug}`} share="morph" default="none">
+        <SiteImage image={item.heroImage} sizes={WALL_SIZES} priority={priority} />
+      </ViewTransition>
       <p className="mt-2 flex items-baseline gap-3 text-meta">
         <span className="min-w-0 flex-1 truncate">
           {item.title}

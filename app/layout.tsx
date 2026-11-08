@@ -35,6 +35,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  viewportFit: "cover", // lets the mobile order bar respect the home indicator
   themeColor: [
     { media: "(prefers-color-scheme: dark)", color: "#1d1717" },
     { media: "(prefers-color-scheme: light)", color: "#f4f0ea" },
@@ -58,6 +59,10 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        {/* Without JS the fade-in never triggers; show images immediately. */}
+        <noscript>
+          <style>{`.img-fade{opacity:1}`}</style>
+        </noscript>
       </head>
       <body className="min-h-dvh">
         <a

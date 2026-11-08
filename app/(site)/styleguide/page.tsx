@@ -193,7 +193,7 @@ export default async function Styleguide() {
           舊連結測試：/item/economics-of-silence →{" "}
           {soldLookup
             ? soldLookup.status === "sold"
-              ? `找得到，狀態為「已售出」，第三階段會顯示「${t.item.sold}」並設為 noindex。`
+              ? `找得到，狀態為「已售出」，頁面顯示「${t.item.sold}」並設為 noindex。`
               : "找得到，狀態為在庫（不符預期）。"
             : "找不到（不符預期）。"}
         </p>

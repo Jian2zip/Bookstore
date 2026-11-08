@@ -167,9 +167,28 @@
 
 /* Smooth page transitions via the View Transitions API, where supported. */
 @media (prefers-reduced-motion: no-preference) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
     animation-duration: var(--dur-page);
     animation-timing-function: var(--ease);
+  }
+  /* Wall image → detail hero. */
+  ::view-transition-group(.morph) {
+    animation-duration: 420ms;
+    animation-timing-function: var(--ease);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* Mobile order bar is fixed; keep the footer clear of it. */
+@media (width < 64rem) {
+  body:has([data-order-bar]) {
+    padding-bottom: 4.75rem;
   }
 }

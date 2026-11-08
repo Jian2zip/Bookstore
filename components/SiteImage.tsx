@@ -11,32 +11,45 @@ interface Props {
   sizes: string;
   priority?: boolean;
   className?: string;
+  /** Fill a fixed-ratio parent (object-fit: cover) instead of using the native ratio. */
+  cover?: boolean;
+}
+
+/** Blurred LQIP as an SVG data URL (the same technique next/image uses). */
+function blurBackground(lqip: string, width: number, height: number): string {
+  const w = 320;
+  const h = Math.round((w * height) / width);
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${w} ${h}'><filter id='b' color-interpolation-filters='sRGB'><feGaussianBlur stdDeviation='14'/><feComponentTransfer><feFuncA type='discrete' tableValues='1 1'/></feComponentTransfer></filter><image width='100%' height='100%' preserveAspectRatio='none' href='${lqip}' filter='url(#b)'/></svg>`;
+  return `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}")`;
 }
 
 /**
  * The one image component for the site:
  * - keeps the native aspect ratio (width/height from CMS metadata, no cropping)
- * - lazy-loads by default, with the LQIP as a blur placeholder
- * - fades in once loaded (disabled under prefers-reduced-motion, see globals.css)
+ * - lazy-loads by default; a blurred LQIP sits underneath while loading
+ * - the image fades in over it once decoded (instant under reduced motion)
  * - Sanity images are resized/encoded by Sanity's CDN; local files by next/image
  */
-export function SiteImage({ image, sizes, priority = false, className = "" }: Props) {
+export function SiteImage({ image, sizes, priority = false, className = "", cover = false }: Props) {
   const [loaded, setLoaded] = useState(false);
   return (
-    <Image
-      src={image.src}
-      width={image.width}
-      height={image.height}
-      alt={image.alt}
-      sizes={sizes}
-      loading={priority ? "eager" : "lazy"}
-      fetchPriority={priority ? "high" : "auto"}
-      placeholder={image.lqip ? "blur" : "empty"}
-      blurDataURL={image.lqip}
-      loader={isSanityImage(image.src) ? sanityLoader : undefined}
-      onLoad={() => setLoaded(true)}
-      data-loaded={loaded || undefined}
-      className={`img-fade h-auto w-full bg-placeholder ${className}`}
-    />
+    <span
+      className={`block overflow-hidden bg-placeholder bg-cover bg-center ${cover ? "h-full w-full" : ""}`}
+      style={image.lqip ? { backgroundImage: blurBackground(image.lqip, image.width, image.height) } : undefined}
+    >
+      <Image
+        src={image.src}
+        width={image.width}
+        height={image.height}
+        alt={image.alt}
+        sizes={sizes}
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
+        loader={isSanityImage(image.src) ? sanityLoader : undefined}
+        onLoad={() => setLoaded(true)}
+        data-loaded={loaded || undefined}
+        className={`img-fade block w-full ${cover ? "h-full object-cover" : "h-auto"} ${className}`}
+      />
+    </span>
   );
 }
