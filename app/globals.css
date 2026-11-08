@@ -1,0 +1,172 @@
+@import "tailwindcss";
+
+/*
+ * 減屋 design tokens
+ * ─────────────────────────────────────────────────────────────────────────
+ * Colour   : semantic tokens only (bg / surface / fg / muted / line / focus /
+ *            placeholder). Dark is the default theme; light via [data-theme].
+ * Type     : three sizes only — meta, body, display. Tailwind's default
+ *            text-* scale is removed so nothing else can creep in.
+ * Spacing  : Tailwind's 4px base, plus fluid named tokens for page gutter,
+ *            wall gap, section rhythm and the reading measure.
+ * Motion   : fade / hover / page durations and one easing curve. All motion
+ *            collapses to none under prefers-reduced-motion.
+ */
+
+/* ── Colour ─────────────────────────────────────────────────────────────── */
+:root,
+:root[data-theme="dark"] {
+  --c-bg: #1d1717;
+  --c-surface: #261f1e; /* drawer, sticky order bar */
+  --c-fg: #ece5dc; /* primary text — 14.2:1 on bg */
+  --c-muted: #a39890; /* meta text — 6.3:1 on bg */
+  --c-line: rgb(236 229 220 / 0.14);
+  --c-focus: #e8c48f;
+  --c-placeholder: #2a2222; /* image box before LQIP paints */
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --c-bg: #f4f0ea;
+  --c-surface: #ebe5dc;
+  --c-fg: #1d1717; /* 15.6:1 on bg */
+  --c-muted: #685d57; /* 5.6:1 on bg */
+  --c-line: rgb(29 23 23 / 0.14);
+  --c-focus: #8a4f1d;
+  --c-placeholder: #e4ddd2;
+  color-scheme: light;
+}
+
+/* ── Motion ─────────────────────────────────────────────────────────────── */
+:root {
+  --dur-fade: 700ms; /* image fade-in */
+  --dur-hover: 240ms; /* product hover */
+  --dur-page: 280ms; /* page transition */
+  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fade: 0ms;
+    --dur-hover: 0ms;
+    --dur-page: 0ms;
+  }
+}
+
+/* ── Tailwind theme ─────────────────────────────────────────────────────── */
+@theme inline {
+  /* Only semantic colours exist as utilities (bg-bg, text-fg, border-line…). */
+  --color-*: initial;
+  --color-bg: var(--c-bg);
+  --color-surface: var(--c-surface);
+  --color-fg: var(--c-fg);
+  --color-muted: var(--c-muted);
+  --color-line: var(--c-line);
+  --color-focus: var(--c-focus);
+  --color-placeholder: var(--c-placeholder);
+
+  /* Headings: Instrument Serif for Latin, Noto Serif TC for Chinese.
+     Body: Noto Sans TC. Both fall back to the system CJK fonts. */
+  --font-*: initial;
+  --font-display:
+    var(--font-instrument-serif), var(--font-noto-serif-tc), "Songti TC", "PMingLiU", serif;
+  --font-sans:
+    var(--font-noto-sans-tc), "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+
+  /* Three-level type scale. */
+  --text-*: initial;
+  --text-meta: 0.75rem; /* 12px — captions, filters, info labels */
+  --text-meta--line-height: 1.6;
+  --text-meta--letter-spacing: 0.04em;
+  --text-body: 0.9375rem; /* 15px — descriptions, nav, buttons */
+  --text-body--line-height: 1.85;
+  --text-body--letter-spacing: 0.02em;
+  --text-display: clamp(1.75rem, 1.2rem + 2.2vw, 3rem); /* 28→48px — H1, shop name on About */
+  --text-display--line-height: 1.2;
+  --text-display--letter-spacing: 0.01em;
+
+  /* Named spacing (Tailwind's 4px base scale stays available as p-4 etc.). */
+  --spacing-gutter: clamp(1rem, 0.5rem + 2vw, 2.5rem); /* page side padding */
+  --spacing-wall: clamp(0.75rem, 0.4rem + 1.2vw, 1.75rem); /* product wall gap */
+  --spacing-section: clamp(4rem, 3rem + 4vw, 8rem); /* between page sections */
+  --spacing-nav: 3.5rem; /* fixed nav height */
+  --container-measure: 32em; /* narrow text column (~32 CJK characters) */
+
+  --ease-soft: var(--ease);
+  --radius-*: initial; /* square corners everywhere */
+}
+
+/* ── Base ───────────────────────────────────────────────────────────────── */
+@layer base {
+  html {
+    background: var(--c-bg);
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-bg font-sans text-body text-fg antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display font-normal;
+  }
+
+  ::selection {
+    background: var(--c-fg);
+    color: var(--c-bg);
+  }
+
+  /* Visible, consistent keyboard focus; never shown for mouse clicks. */
+  :focus-visible {
+    outline: 2px solid var(--c-focus);
+    outline-offset: 3px;
+  }
+
+  a {
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
+  }
+
+  /* Prices and SKUs line up. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ── Motion utilities ──────────────────────────────────────────────────── */
+@layer components {
+  /* Images fade in once decoded (SiteImage sets data-loaded). */
+  .img-fade {
+    opacity: 0;
+    transition: opacity var(--dur-fade) var(--ease);
+  }
+  .img-fade[data-loaded] {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .img-fade {
+      opacity: 1;
+    }
+  }
+
+  /* Subtle hover for product tiles: image dims slightly, caption brightens. */
+  .tile-hover img {
+    transition: opacity var(--dur-hover) var(--ease);
+  }
+  .tile-hover:hover img[data-loaded],
+  .tile-hover:focus-visible img[data-loaded] {
+    opacity: 0.86;
+  }
+}
+
+/* Smooth page transitions via the View Transitions API, where supported. */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: var(--dur-page);
+    animation-timing-function: var(--ease);
+  }
+}

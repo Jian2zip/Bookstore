@@ -1,0 +1,352 @@
+/**
+ * Demo data used when no Sanity project is configured.
+ * All titles, authors and publishers here are fictional.
+ *
+ * Includes one sold item (b006) to exercise the hiding logic: it must never
+ * appear on the wall, in filters, in "similar items" or in the sitemap, but
+ * its old URL should still resolve to a "sold" notice.
+ */
+import type {
+  AboutPage,
+  GalleryEntry,
+  InterludeTile,
+  Item,
+  Orientation,
+  SiteImage,
+  SiteSettings,
+} from "../types";
+import manifest from "./placeholder-images.json";
+
+type ImageName = keyof typeof manifest;
+
+function img(name: ImageName, alt: string): SiteImage {
+  const m = manifest[name];
+  const orientation: Orientation = m.width >= m.height ? "landscape" : "portrait";
+  return { ...m, alt, orientation };
+}
+
+function gallery(...entries: [ImageName, string][]): GalleryEntry[] {
+  return entries.map(([name, alt]) => ({ kind: "image" as const, ...img(name, alt) }));
+}
+
+export const placeholderSettings: SiteSettings = {
+  shopName: "減屋",
+  tagline: "意識如錢一般在流動。",
+  email: "jian2survey@gmail.com",
+  // phone / address intentionally omitted → not rendered.
+  socialLinks: [],
+  shipping: {
+    method: "超商店到店",
+    fee: undefined, // TBD
+    feeNotes: "多件合併寄送只收一次運費。",
+  },
+};
+
+export const placeholderAbout: AboutPage = {
+  tagline: "意識如錢一般在流動。",
+  intro: [
+    "減屋是一間很小的二手書與雜貨店。東西從一個人手上，流到另一個人手上。",
+    "每件物品只有一件，照片與說明就是它現在的樣子。",
+  ],
+  buyingNote: [
+    "我們收書。歡迎把書單和幾張照片寄到信箱，回信告訴你估價與收購方式。",
+  ],
+};
+
+export const placeholderItems: Item[] = [
+  {
+    id: "b001",
+    type: "book",
+    title: "河流的文法",
+    slug: "river-grammar",
+    sku: "B001",
+    category: "散文",
+    tags: ["初版"],
+    price: 280,
+    stock: 1,
+    status: "inStock",
+    heroImage: img("b001-hero", "《河流的文法》封面，深褐色布面精裝"),
+    gallery: gallery(
+      ["b001-cover", "封面平拍"],
+      ["b001-spine", "書脊，燙印書名清楚"],
+      ["b001-pages", "內頁跨頁，無劃記"],
+      ["b001-edge", "書口，略有淡黃"],
+      ["b001-detail", "封面右下角，輕微磨圓"],
+    ),
+    description: [
+      "1998 年初版一刷，布面精裝。作者沿著一條河寫了十二篇散文，從上游的石頭寫到出海口的鹽。",
+      "文字很慢，適合在通勤以外的時間讀。這一本保存得乾淨，前一位主人顯然讀得很小心。",
+    ],
+    condition: "good",
+    conditionNotes: "書口略有淡黃，封面右下角輕微磨圓，內頁無劃記。",
+    author: "林硯",
+    publisher: "遠山出版",
+    year: 1998,
+    edition: "初版一刷",
+    language: "繁體中文",
+    publishedAt: "2026-11-02",
+  },
+  {
+    id: "b002",
+    type: "book",
+    title: "夜行列車手記",
+    slug: "night-train-notes",
+    sku: "B002",
+    category: "文學",
+    tags: ["翻譯"],
+    price: 220,
+    stock: 1,
+    status: "inStock",
+    heroImage: img("b002-hero", "《夜行列車手記》封面，藍色平裝"),
+    gallery: gallery(
+      ["b002-cover", "封面平拍"],
+      ["b002-spine", "書脊"],
+      ["b002-pages", "內頁"],
+      ["b002-edge", "書口，乾淨"],
+      ["b002-detail", "封底一角"],
+    ),
+    description: [
+      "一位車掌在末班夜車上記下的乘客與站名，短篇連作。譯筆節制，保留了原文那種刻意的停頓。",
+      "2004 年中譯初版，品相接近全新，像是買了之後一直放在書架上沒動過。",
+    ],
+    condition: "likeNew",
+    conditionNotes: "近乎全新，僅封底有一處極淡的指痕。",
+    author: "渡邊澄",
+    translator: "陳若水",
+    publisher: "灰燼文化",
+    year: 2004,
+    edition: "初版",
+    language: "繁體中文",
+    publishedAt: "2026-10-28",
+  },
+  {
+    id: "b003",
+    type: "book",
+    title: "舊物的時間",
+    slug: "time-of-old-things",
+    sku: "B003",
+    category: "攝影",
+    tags: ["大開本"],
+    price: 520,
+    stock: 1,
+    status: "inStock",
+    heroImage: img("b003-hero", "《舊物的時間》封面，紅褐色大開本"),
+    gallery: gallery(
+      ["b003-cover", "封面平拍"],
+      ["b003-spine", "書脊，有輕微摺痕"],
+      ["b003-pages", "內頁圖版"],
+      ["b003-edge", "書口，有書斑"],
+      ["b003-detail", "封面邊角磨損"],
+    ),
+    description: [
+      "攝影集，拍的是城市裡被留下來的東西：舊招牌、門把、一張沒人坐的椅子。印刷用的是霧面紙，暗部層次很好。",
+      "這本有明顯的使用痕跡，但圖版都完整，很適合拿來翻、而不是收藏。",
+    ],
+    condition: "fair",
+    conditionNotes: "書口有書斑，書脊有輕微摺痕，封面邊角磨損。圖版完整。",
+    author: "周以安",
+    publisher: "平行線",
+    year: 2011,
+    language: "繁體中文",
+    isbn: "9780000000003",
+    publishedAt: "2026-10-20",
+  },
+  {
+    id: "b004",
+    type: "book",
+    title: "島嶼植物誌",
+    slug: "island-flora",
+    sku: "B004",
+    category: "自然",
+    tags: ["絕版"],
+    price: 380,
+    stock: 1,
+    status: "inStock",
+    heroImage: img("b004-hero", "《島嶼植物誌》封面，綠色精裝"),
+    gallery: gallery(
+      ["b004-cover", "封面平拍"],
+      ["b004-spine", "書脊"],
+      ["b004-pages", "內頁手繪圖"],
+      ["b004-edge", "書口"],
+      ["b004-detail", "封面水漬特寫"],
+    ),
+    description: [
+      "1987 年出版的植物圖鑑，手繪插圖，已絕版多年。每一種植物都附有採集地點和花期。",
+      "封面有一塊水漬、扉頁蓋有前主人的藏書章，價格已反映瑕疵。",
+    ],
+    condition: "flawed",
+    conditionNotes: "封面有一處水漬（見照片），扉頁有藏書章，內頁完整。",
+    author: "許青禾",
+    publisher: "南方自然社",
+    year: 1987,
+    edition: "初版",
+    language: "繁體中文",
+    publishedAt: "2026-10-15",
+  },
+  {
+    id: "b005",
+    type: "book",
+    title: "A Quiet Room",
+    slug: "a-quiet-room",
+    sku: "B005",
+    category: "外文",
+    tags: ["英文"],
+    price: 300,
+    stock: 1,
+    status: "inStock",
+    heroImage: img("b005-hero", "A Quiet Room 封面，酒紅色平裝"),
+    gallery: gallery(
+      ["b005-cover", "封面平拍"],
+      ["b005-spine", "書脊"],
+      ["b005-pages", "內頁"],
+      ["b005-edge", "書口"],
+      ["b005-detail", "封面一角"],
+    ),
+    description: [
+      "英文小說，一個人在租來的房間裡度過一整個冬天。句子短，生字不多，適合想開始讀英文小說的人。",
+      "平裝本，翻閱痕跡輕微。",
+    ],
+    condition: "good",
+    conditionNotes: "輕微翻閱痕跡，書脊無裂。",
+    author: "Margaret Hale",
+    publisher: "Harbour Press",
+    year: 2009,
+    language: "英文",
+    publishedAt: "2026-11-05",
+  },
+  {
+    // ── SOLD: must be hidden everywhere except its own (noindex) URL ──
+    id: "b006",
+    type: "book",
+    title: "沉默的經濟學",
+    slug: "economics-of-silence",
+    sku: "B006",
+    category: "社會",
+    tags: [],
+    price: 260,
+    stock: 1,
+    status: "sold",
+    heroImage: img("b006-hero", "《沉默的經濟學》封面"),
+    gallery: gallery(["b006-cover", "封面平拍"], ["b006-spine", "書脊"]),
+    description: ["已售出。"],
+    condition: "good",
+    author: "陸安",
+    publisher: "邊界書房",
+    year: 2015,
+    language: "繁體中文",
+    publishedAt: "2026-11-06",
+  },
+  {
+    id: "g001",
+    type: "goods",
+    title: "黃銅書擋（一對）",
+    slug: "brass-bookends",
+    sku: "G001",
+    category: "文具",
+    tags: [],
+    price: 680,
+    stock: 1,
+    status: "inStock",
+    heroImage: img("g001-hero", "黃銅書擋正面"),
+    gallery: gallery(
+      ["g001-side", "書擋側面"],
+      ["g001-top", "書擋俯視"],
+      ["g001-detail", "表面氧化紋理特寫"],
+    ),
+    description: [
+      "實心黃銅，一對兩只，底部有防滑毛氈。表面有自然氧化的深色斑，沒有刻意拋光，保留使用過的樣子。",
+      "夠重，可以撐住一整排精裝書。",
+    ],
+    condition: "good",
+    conditionNotes: "表面自然氧化，底部毛氈完整。",
+    dimensions: "寬 10 × 深 8 × 高 14 cm（單只）",
+    material: "黃銅、毛氈",
+    origin: "日本",
+    publishedAt: "2026-11-01",
+  },
+  {
+    id: "g002",
+    type: "goods",
+    title: "手織棉布書衣",
+    slug: "woven-book-cover",
+    sku: "G002",
+    category: "布物",
+    tags: ["A5"],
+    price: 320,
+    stock: 3,
+    status: "inStock",
+    heroImage: img("g002-hero", "手織棉布書衣正面"),
+    gallery: gallery(
+      ["g002-side", "書衣攤開"],
+      ["g002-top", "書衣捲起"],
+      ["g002-detail", "織紋特寫"],
+    ),
+    description: [
+      "手織棉布書衣，適用 A5 尺寸的平裝書，可調整寬度。附一條同布料書籤帶。",
+      "庫存三件，花色略有差異。",
+    ],
+    condition: "likeNew",
+    dimensions: "適用 A5（14.8 × 21 cm）",
+    material: "棉",
+    origin: "台灣",
+    publishedAt: "2026-10-30",
+  },
+  {
+    id: "g003",
+    type: "goods",
+    title: "玻璃墨水瓶",
+    slug: "glass-ink-bottle",
+    sku: "G003",
+    category: "器物",
+    tags: [],
+    price: 240,
+    stock: 1,
+    status: "inStock",
+    heroImage: img("g003-hero", "玻璃墨水瓶正面"),
+    gallery: gallery(
+      ["g003-side", "墨水瓶側面"],
+      ["g003-top", "瓶口俯視"],
+      ["g003-detail", "瓶身氣泡特寫"],
+    ),
+    description: [
+      "舊的玻璃墨水瓶，瓶身有手工吹製留下的小氣泡。已清洗，可以當小花瓶或筆插。",
+    ],
+    condition: "fair",
+    conditionNotes: "瓶口有一處小缺角（不割手），瓶身有細微刮痕。",
+    dimensions: "直徑 6 × 高 7 cm",
+    material: "玻璃",
+    publishedAt: "2026-10-18",
+  },
+  {
+    id: "g004",
+    type: "goods",
+    title: "木製明信片架",
+    slug: "wooden-postcard-stand",
+    sku: "G004",
+    category: "器物",
+    tags: [],
+    price: 450,
+    stock: 1,
+    status: "inStock",
+    heroImage: img("g004-hero", "木製明信片架正面"),
+    gallery: gallery(
+      ["g004-side", "明信片架側面"],
+      ["g004-top", "明信片架俯視"],
+      ["g004-detail", "木紋特寫"],
+    ),
+    description: [
+      "實木明信片架，三道溝槽，可以立放明信片、小卡或薄的小書。表面上過油，有使用過的細痕。",
+    ],
+    condition: "good",
+    conditionNotes: "表面有細微使用痕。",
+    dimensions: "寬 18 × 深 6 × 高 3 cm",
+    material: "胡桃木",
+    publishedAt: "2026-10-10",
+  },
+];
+
+export const placeholderTiles: InterludeTile[] = [
+  { id: "tile-shelf", image: img("tile-shelf", "店內書架一角"), position: 2 },
+  { id: "tile-display", image: img("tile-display", "店內陳列桌"), position: 5 },
+  { id: "tile-spines", image: img("tile-spines", "書脊特寫"), position: 8 },
+];
